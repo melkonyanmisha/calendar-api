@@ -1,4 +1,5 @@
 import Event from '../models/event.js';
+import moment from "moment";
 
 class CalendarController {
 
@@ -17,8 +18,16 @@ class CalendarController {
     async getEvents(req, res) {
         try {
             const {date} = req.params;
+            const startOfDay = moment(date).startOf('day');
+            const endOfDay = moment(date).endOf('day');
 
-            const event = await Event.find({date});
+            const event = await Event.find({
+                date: {
+                    $gte: startOfDay,
+                    $lt: endOfDay
+                }
+            });
+
             if (!event) {
                 return res.status(404).json({message: 'Event not found'});
             }
